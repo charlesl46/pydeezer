@@ -7,8 +7,6 @@ from pydeezer.classes.model import Model
 class Album(Model):
     __generic_name__ = "album"
 
-    title: str
-    link: str
-    cover: str
-    
-
+    title: str = None
+    link: str = None
+    cover: str = None

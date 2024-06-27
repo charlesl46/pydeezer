@@ -1,12 +1,24 @@
 from dataclasses import dataclass, fields
-from typing import Self
+from typing import Self, List
+import asyncio
 
-from pydeezer.request import get
+from pydeezer.request import get, get_async
 
 
 @dataclass
 class Model:
     id: str
+    _is_complete: bool = (
+        True  # this boolean tells if an object contains all info available on deezer.com, for example, if it was recovered following a indirect request, there can be missing info
+    )
+
+    def complete(self):
+        if not self._is_complete:
+            comp = self.by_id(str(self.id))
+            comp._is_complete = True
+            return comp
+        else:
+            return self
 
     @classmethod
     def from_dict(cls, dico: dict):
@@ -18,7 +30,12 @@ class Model:
         return cls(**cleaned_dico)
 
     @classmethod
-    def by_id(cls, id: str) -> Self:
-        endpoint = "/".join([cls.__generic_name__, id])
-        json = get(endpoint)
-        return cls.from_dict(json)
+    def by_id(cls, id: str | List) -> Self | List[Self]:
+        if type(id) == list:
+            endpoints = ["/".join([cls.__generic_name__, _id]) for _id in id]
+            responses = asyncio.run(get_async(urls=endpoints))
+            return [cls.from_dict(response) for response in responses]
+        else:
+            endpoint = "/".join([cls.__generic_name__, id])
+            json = get(endpoint)
+            return cls.from_dict(json)

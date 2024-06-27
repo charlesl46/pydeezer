@@ -1,2 +1,2 @@
 format:
-	python3 -m black .
+	poetry run black .
