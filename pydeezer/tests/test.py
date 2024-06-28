@@ -2,17 +2,22 @@ import pydeezer
 
 from pprint import pprint
 from dataclasses import asdict
+from unittest import TestCase
 
+import pydeezer.utils
 
-def test():
-    tracks = pydeezer.Track.search("Highway to Hell")
-    track = tracks[0]
+ALBUM = pydeezer.Album.by_id("226069")
+ARTIST = pydeezer.Artist.by_id("176")
 
-    acdc = track.artist
-    print(acdc)
-    acdc = acdc.complete()
-    print(acdc)
+class Tests(TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.album_title = "Dire Straits"
+        self.first_song_title = "Down To The Waterline"
+        self.release_date = pydeezer.utils.read_datetime("1983-02-15")
 
-
-if __name__ == "__main__":
-    test()
+    def test_album(self):
+        self.assertEqual(ALBUM.title,"Dire Straits")
+        self.assertEqual(ALBUM.release_date,self.release_date)
+        self.assertEqual(ALBUM.artist,ARTIST)
+        

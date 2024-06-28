@@ -8,7 +8,7 @@ from pydeezer.ordering import ordering_type
 from pydeezer.request import get
 
 
-@dataclass
+@dataclass(eq=False)
 class Artist(Model):
     __generic_name__ = "artist"
 

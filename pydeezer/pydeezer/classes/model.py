@@ -1,16 +1,20 @@
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, fields, asdict
 from typing import Self, List
 import asyncio
 
 from pydeezer.request import get, get_async
 
 
-@dataclass
+@dataclass(eq=False)
 class Model:
-    id: str
+    id: int
+    _json: dict = None
     _is_complete: bool = (
         True  # this boolean tells if an object contains all info available on deezer.com, for example, if it was recovered following a indirect request, there can be missing info
     )
+
+    def __eq__(self, value: Self) -> bool:
+        return self.id == value.id
 
     def complete(self):
         if not self._is_complete:
@@ -27,7 +31,9 @@ class Model:
         cleaned_dico = {
             key: value for key, value in dico.items() if key in fields_names
         }
-        return cls(**cleaned_dico)
+        obj = cls(**cleaned_dico)
+        obj._json = dico
+        return obj
 
     @classmethod
     def by_id(cls, id: str | List) -> Self | List[Self]:
@@ -39,3 +45,7 @@ class Model:
             endpoint = "/".join([cls.__generic_name__, id])
             json = get(endpoint)
             return cls.from_dict(json)
+        
+    @property
+    def missing_fields(self):
+        return [key for key,value in asdict(self).items() if value is None]

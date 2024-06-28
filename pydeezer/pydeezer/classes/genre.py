@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from pydeezer.classes.model import Model
 
 
-@dataclass
+@dataclass(eq=False)
 class Genre(Model):
     __generic_name__ = "genre"
 

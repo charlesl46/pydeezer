@@ -12,7 +12,7 @@ from pydeezer.utils import read_datetime
 from pydeezer.classes.artist import Artist
 
 
-@dataclass
+@dataclass(eq=False)
 class Track(Model):
     __generic_name__ = "track"
 
